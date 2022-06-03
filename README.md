@@ -15,14 +15,14 @@ Advice and contributions are welcome.
 
 Arguments:
 
-                {"token", required_argument, 0, 't'},
-                {"type", required_argument, 0, 'T'},
-                {"description", required_argument, 0, 'd'},
-                {"summary", required_argument, 0, 'e'},
-                {"host", required_argument, 0, 'h'},
-                {"service", unrequired_argument, 0, 's'},
-                {"state", required_argument, 0, 'S'},
-                {"roomId", required_argument, 0, 'r'},
+                --token, -t **required**
+                --type, -T **required**
+                --description, -d **required**
+                --summary, -e **required**
+                --host, -h **required**
+                --service, -s 
+                --state, -S **required**
+                --roomId, -r **required**
 
 Example:
 
