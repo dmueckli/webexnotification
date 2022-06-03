@@ -22,6 +22,6 @@ Advice and contributions are welcome.
 
 ./main --type PROBLEM --token YOURWEBEXBOTTOKEN --description 'apt on Icinga Master is WARNING' --summary 'APT WARNING: 1 packages available for upgrade (0 critical updates).' --host 'Icinga Master' --state WARNING --roomId YOURWEBEXROOMID
 
-Output:
-      [PROBLEM]: apt on Icinga Master is WARNING
+Output:\n
+      [PROBLEM]: apt on Icinga Master is WARNING\n
       APT WARNING: 1 packages available for upgrade (0 critical updates).
