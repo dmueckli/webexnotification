@@ -70,14 +70,6 @@ int main(int argc, char **argv)
     char *state = NULL;
     char *roomId = NULL;
 
-    // std::cout << argc << std::endl;
-
-    // for (int i = 0; i < argc; i++)
-    // {
-    //     std::cout << argv[i] << std::endl;
-    // }
-    
-
     if (argc < 15)
     {
         std::cerr << argv[0] << ": Mandatory fields not provided." << std::endl
@@ -231,26 +223,6 @@ int main(int argc, char **argv)
 
         return EXIT_FAILURE;
     }
-
-    // if (service == NULL)
-    // {
-    //     std::cerr << argv[0]
-    //               << ": Service not specified " << std::endl
-    //               << argv[0] << ": Usage: "
-    //               << argv[0]
-    //               << " --token token "
-    //               << " --type type "
-    //               << " --description  description "
-    //               << " --summary summary "
-    //               << " --host host "
-    //               << " --service service "
-    //               << " --state state "
-    //               << " --roomId roomId "
-    //               << std::endl;
-    //     ;
-
-    //     return EXIT_FAILURE;
-    // }
 
     if (state == NULL)
     {
