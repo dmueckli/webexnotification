@@ -61,16 +61,24 @@ std::future<std::string> invoke(std::string const &url, std::string const &body,
 int main(int argc, char **argv)
 {
     int c;
-    char *token;
-    char *type;
-    char *description;
-    char *summary;
-    char *host;
-    char *service;
-    char *state;
-    char *roomId;
+    char *token = NULL;
+    char *type = NULL;
+    char *description = NULL;
+    char *summary = NULL;
+    char *host = NULL;
+    char *service = NULL;
+    char *state = NULL;
+    char *roomId = NULL;
 
-    if (argc < 7)
+    // std::cout << argc << std::endl;
+
+    // for (int i = 0; i < argc; i++)
+    // {
+    //     std::cout << argv[i] << std::endl;
+    // }
+    
+
+    if (argc < 15)
     {
         std::cerr << argv[0] << ": Mandatory fields not provided." << std::endl
                   << argv[0] << ": Usage: "
@@ -175,7 +183,18 @@ int main(int argc, char **argv)
         }
     }
 
-    if (!&type)
+        /* Print any remaining command line arguments (not options). */
+    if (optind < argc)
+    {
+        printf("Unknown elements: ");
+        while (optind < argc)
+            printf("%s ", argv[optind++]);
+        putchar('\n');
+
+        return EXIT_FAILURE;
+    }
+
+    if (type == NULL)
     {
         std::cerr << "Type not provided. \n "
                   << ": Usage: "
@@ -193,11 +212,10 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    printf("Hostname: %s\n", host);
-    printf("Service: %s\n", service);
     if (host == NULL)
     {
-        std::cerr << argv[0] << ": Hostname not specified " << std::endl
+        std::cerr << argv[0]
+                  << ": Hostname not specified " << std::endl
                   << argv[0] << ": Usage: "
                   << argv[0]
                   << " --token token "
@@ -214,7 +232,27 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (!state)
+    // if (service == NULL)
+    // {
+    //     std::cerr << argv[0]
+    //               << ": Service not specified " << std::endl
+    //               << argv[0] << ": Usage: "
+    //               << argv[0]
+    //               << " --token token "
+    //               << " --type type "
+    //               << " --description  description "
+    //               << " --summary summary "
+    //               << " --host host "
+    //               << " --service service "
+    //               << " --state state "
+    //               << " --roomId roomId "
+    //               << std::endl;
+    //     ;
+
+    //     return EXIT_FAILURE;
+    // }
+
+    if (state == NULL)
     {
         std::cerr << "State not provided. \n "
                   << ": Usage: "
@@ -232,7 +270,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (!token)
+    if (token == NULL)
     {
         std::cerr << "Token not provided. \n "
                   << ": Usage: "
@@ -250,7 +288,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (!roomId)
+    if (roomId == NULL)
     {
         std::cerr << "Room ID not provided. \n "
                   << ": Usage: "
@@ -268,7 +306,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (!description)
+    if (description == NULL)
     {
         std::cerr << "Description not provided. \n "
                   << ": Usage: "
@@ -286,7 +324,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (!summary)
+    if (summary == NULL)
     {
         std::cerr << "Summary not provided. \n "
                   << ": Usage: "
@@ -308,8 +346,10 @@ int main(int argc, char **argv)
 
     printf("Type: %s\n", type);
     printf("Hostname: %s\n", host);
-    if (service)
+    if (service != NULL)
+    {
         printf("Service: %s\n", service);
+    }
     printf("State: %s\n", state);
     printf("Token: %s\n", token);
     printf("Room identifier: %s\n", roomId);
@@ -378,14 +418,7 @@ int main(int argc, char **argv)
     if (verbose_flag)
         puts("verbose flag is set");
 
-    /* Print any remaining command line arguments (not options). */
-    if (optind < argc)
-    {
-        printf("non-option ARGV-elements: ");
-        while (optind < argc)
-            printf("%s ", argv[optind++]);
-        putchar('\n');
-    }
+
 
     return EXIT_SUCCESS;
     // exit(0);
