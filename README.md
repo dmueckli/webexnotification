@@ -15,14 +15,14 @@ Advice and contributions are welcome.
 
 Arguments:
 
-                --token, -t **required**
-                --type, -T **required**
-                --description, -d **required**
-                --summary, -e **required**
-                --host, -h **required**
+                --token, -t required
+                --type, -T required
+                --description, -d required
+                --summary, -e required
+                --host, -h required
                 --service, -s 
-                --state, -S **required**
-                --roomId, -r **required**
+                --state, -S required
+                --roomId, -r required
 
 Example:
 
