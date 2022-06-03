@@ -15,14 +15,14 @@ Advice and contributions are welcome.
 
 Arguments:
 
-                --token, -t required
-                --type, -T required
-                --description, -d required
-                --summary, -e required
-                --host, -h required
-                --service, -s 
-                --state, -S required
-                --roomId, -r required
+                --token, -t required            // Webex Bot token (See https://developer.webex.com/docs/bots for more information)
+                --type, -T required             // Notification Type, e.g. PROBLEM or RECOVERY
+                --description, -d required      // e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
+                --summary, -e required          // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2)
+                --host, -h required             // host name
+                --service, -s                   // service name
+                --state, -S required            // service state
+                --roomId, -r required           // Webex RoomId to send the message to
 
 Example:
 
