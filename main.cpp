@@ -360,7 +360,7 @@ int main(int argc, char **argv)
 
     const char *url = "https://webexapis.com/v1/messages";
 
-    std::string body = "{\"roomId\": \"" + std::string(roomId) + "\", \"markdown\": \"[" + type + "]: " + description + "\\n" + summary + "\"}";
+    std::string body = "{\"roomId\": \"" + std::string(roomId) + "\", \"markdown\": \"[" + type + "]: " + summary + "\\n" + description + "\"}";
 
     try
     {
