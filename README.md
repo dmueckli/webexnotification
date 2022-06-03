@@ -1,6 +1,6 @@
-# webexnotificationplugin
+# Webex notification script for Icinga2
 
-A simple webex notification command for nagios / icinga2 written in c++.
+A simple webex notification script for nagios / icinga2 written in c++.
 
 Please note that I am currently taking my first steps in programming through projects like this. 
 
