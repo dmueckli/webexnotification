@@ -351,12 +351,22 @@ int main(int argc, char **argv)
 
     const char *url = "https://webexapis.com/v1/messages";
 
+    std::string testDescription = "\\\"Icinga Director: everything is fine\n\nDirector configuration: 3 tests OK\n[OK] Database resource 'Director DB' has been specified\n[OK] Make sure the DB schema exists\n[OK] There are no pending schema migrations\n\nDirector Deployments: 3 tests OK\n[OK] Deployment endpoint is 'muecklich.com'\n[OK] There are 0 un-deployed changes\n[OK] The last Deployment was successful 1m 37s ago\n\nImport Sources: 1 tests OK\n[OK] No Import Sources have been defined\n\nSync Rules: 1 tests OK\n[OK] No Sync Rules have been defined\n\nDirector Jobs: 1 tests OK\n[OK] No Jobs have been defined\\\"";
+
+
     std::string from = "\n";
     std::string to = "\\n";
 
     std::string str(description);
 
     replaceAll(str, from, to);
+
+
+
+    str.erase(0, 2);
+
+    str.pop_back();
+    str.pop_back();
 
     std::string body = "{\"roomId\": \"" + std::string(roomId) + "\", \"markdown\": \"[" + type + "]: " + summary + "\\n" + str + "\"}";
 
