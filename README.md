@@ -12,11 +12,6 @@ Advice and contributions are welcome.
 2. Compile the main.cpp file: 
 
         g++ main.cpp -l curlpp -l curl -l pthread -o main
-        
-(I) Currently you need to set the description in the icinga notification command into double quotes with escape character to handle blank spaces in single quotes ('Director DB' would be cut after Director) -> 
-
-        \"$description$\"
-, otherwise the string would be cut.
 
 Arguments:
 
