@@ -15,6 +15,18 @@
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
 
+void replaceAll(std::string &str, const std::string &from, const std::string &to)
+{
+    if (from.empty())
+        return;
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+    }
+}
+
 std::future<std::string> invoke(std::string const &url, std::string const &body, std::string const &token)
 {
     std::future<std::string> rData = std::async(
@@ -69,6 +81,13 @@ int main(int argc, char **argv)
     char *service = NULL;
     char *state = NULL;
     char *roomId = NULL;
+
+    std::cout << argc << std::endl;
+
+    for (int i = 0; i < argc; i++)
+    {
+        std::cout << argv[i] << std::endl;
+    }
 
     if (argc < 15)
     {
@@ -175,7 +194,7 @@ int main(int argc, char **argv)
         }
     }
 
-        /* Print any remaining command line arguments (not options). */
+    /* Print any remaining command line arguments (not options). */
     if (optind < argc)
     {
         printf("Unknown elements: ");
@@ -332,7 +351,14 @@ int main(int argc, char **argv)
 
     const char *url = "https://webexapis.com/v1/messages";
 
-    std::string body = "{\"roomId\": \"" + std::string(roomId) + "\", \"markdown\": \"[" + type + "]: " + summary + "\\n" + description + "\"}";
+    std::string from = "\n";
+    std::string to = "\\n";
+
+    std::string str(description);
+
+    replaceAll(str, from, to);
+
+    std::string body = "{\"roomId\": \"" + std::string(roomId) + "\", \"markdown\": \"[" + type + "]: " + summary + "\\n" + str + "\"}";
 
     try
     {
@@ -389,8 +415,6 @@ int main(int argc, char **argv)
        we report the final status resulting from them. */
     if (verbose_flag)
         puts("verbose flag is set");
-
-
 
     return EXIT_SUCCESS;
     // exit(0);
