@@ -8,8 +8,11 @@ Advice and contributions are welcome.
 
 ## Usage 
 
-1. Install dependencies: libcurlpp-dev (debian/ubuntu)
-2. Compile the main.cpp file: 
+1. Install dependencies:
+ 
+        libcurlpp-dev (debian/ubuntu) or https://github.com/jpbarrette/curlpp
+        
+3. Compile the main.cpp file: 
 
         g++ main.cpp -l curlpp -l curl -l pthread -o main
 
