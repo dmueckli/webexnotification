@@ -22,7 +22,7 @@ Arguments:
 
                 --token, -t required            // Webex Bot token (See https://developer.webex.com/docs/bots for more information)
                 --type, -T required             // Notification Type, e.g. PROBLEM or RECOVERY
-                --description, -d required      // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2) !!! You need to set this in escaped double quotes when sending to the script \"$service.output$\" !!!
+                --description, -d required      // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2) 
                 --summary, -e                   // e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
                 --host, -h required             // host
                 --hostname, -h required         // host display name
