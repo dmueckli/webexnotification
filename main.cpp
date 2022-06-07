@@ -327,10 +327,10 @@ int main(int argc, char **argv)
     replaceAll(mDescription, "\[CRITICAL\]", "&#128308;");
     replaceAll(mDescription, "\[UNKNOWN\]", "&#128995;");
 
-    mDescription.erase(0, 2);
+    // mDescription.erase(0, 2);
 
-    mDescription.pop_back();
-    mDescription.pop_back();
+    // mDescription.pop_back();
+    // mDescription.pop_back();
 
     // https://icinga.muecklich.com/icingadb/host?name=muecklich.com
 
