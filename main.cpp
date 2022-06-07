@@ -15,23 +15,23 @@
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
 
-void replaceAll(std::string &str, const std::string &from, const std::string &to)
+void replaceAll(std::string &mDescription, const std::string &from, const std::string &to)
 {
     if (from.empty())
         return;
     size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    while ((start_pos = mDescription.find(from, start_pos)) != std::string::npos)
     {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+        mDescription.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'from' with 'to'
     }
 }
 
-std::future<std::string> invoke(std::string const &url, std::string const &body, std::string const &token)
+std::future<std::string> invoke(std::string const &webexUrl, std::string const &body, std::string const &token)
 {
     std::future<std::string> rData = std::async(
         std::launch::async,
-        [&token](std::string const &url, std::string const &body) mutable
+        [&token](std::string const &webexUrl, std::string const &body) mutable
         {
             std::list<std::string> header;
             header.push_back("Authorization: Bearer " + token);
@@ -40,7 +40,7 @@ std::future<std::string> invoke(std::string const &url, std::string const &body,
 
             curlpp::Cleanup clean;
             curlpp::Easy r;
-            r.setOpt(new curlpp::options::Url(url));
+            r.setOpt(new curlpp::options::Url(webexUrl));
             r.setOpt(new curlpp::options::HttpHeader(header));
             r.setOpt(new curlpp::options::PostFields(body));
             r.setOpt(new curlpp::options::PostFieldSize(body.length()));
@@ -65,7 +65,7 @@ std::future<std::string> invoke(std::string const &url, std::string const &body,
 
             return std::string(response.str());
         },
-        url, body);
+        webexUrl, body);
 
     return rData;
 }
@@ -78,33 +78,35 @@ int main(int argc, char **argv)
     char *description = NULL;
     char *summary = NULL;
     char *host = NULL;
+    char *hostname = NULL;
     char *service = NULL;
     char *state = NULL;
     char *roomId = NULL;
+    char *icingaUrl = NULL;
 
-    std::cout << argc << std::endl;
+    // std::cout << argc << std::endl;
 
-    for (int i = 0; i < argc; i++)
-    {
-        std::cout << argv[i] << std::endl;
-    }
+    // for (int i = 0; i < argc; i++)
+    // {
+    //     std::cout << argv[i] << std::endl;
+    // }
 
-    if (argc < 15)
-    {
-        std::cerr << argv[0] << ": Mandatory fields not provided." << std::endl
-                  << argv[0] << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        return EXIT_FAILURE;
-    }
+    // if (argc < 15)
+    // {
+    //     std::cerr << argv[0] << ": Mandatory fields not provided." << std::endl
+    //               << argv[0] << ": Usage: "
+    //               << argv[0]
+    //               << " --token token "
+    //               << " --type type "
+    //               << " --description  description "
+    //               << " --summary summary "
+    //               << " --host host "
+    //               << " --service service "
+    //               << " --state state "
+    //               << " --roomId roomId "
+    //               << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
     while (optind < argc)
     {
@@ -124,15 +126,17 @@ int main(int argc, char **argv)
                 {"description", required_argument, 0, 'd'},
                 {"summary", required_argument, 0, 'e'},
                 {"host", required_argument, 0, 'h'},
+                {"hostname", required_argument, 0, 'N'},
                 {"service", required_argument, 0, 's'},
                 {"state", required_argument, 0, 'S'},
                 {"roomId", required_argument, 0, 'r'},
+                {"icingaUrl", required_argument, 0, 'i'},
                 // {"files", required_argument, 0, 'f'},
                 {0, 0, 0, 0}};
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "abc:d:f:",
+        c = getopt_long(argc, argv, "t:T:d:e:h:N:s:S:r:i:",
                         long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -169,6 +173,10 @@ int main(int argc, char **argv)
             host = optarg;
             break;
 
+        case 'N':
+            hostname = optarg;
+            break;
+
         case 's':
             service = optarg;
             break;
@@ -183,6 +191,10 @@ int main(int argc, char **argv)
 
         case 'e':
             summary = optarg;
+            break;
+
+        case 'i':
+            icingaUrl = optarg;
             break;
 
         case '?':
@@ -205,119 +217,56 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (type == NULL)
+    if (!type || !token || !host || !state || !roomId || !description)
     {
-        std::cerr << "Type not provided. \n "
-                  << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        ;
-        return EXIT_FAILURE;
-    }
+        // TODO: set the last comma to an and
+        int counter = 0;
+        std::string message;
 
-    if (host == NULL)
-    {
-        std::cerr << argv[0]
-                  << ": Hostname not specified " << std::endl
-                  << argv[0] << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        ;
+        if (!type)
+        {
+            counter++;
+            message += "type, ";
+        }
+        if (!token)
+        {
+            counter++;
+            message += "token, ";
+        }
+        if (!host)
+        {
+            counter++;
+            message += "host, ";
+        }
+        if (!state)
+        {
+            counter++;
+            message += "state, ";
+        }
+        if (!roomId)
+        {
+            counter++;
+            message += "roomId, ";
+        }
+        if (!description)
+        {
+            counter++;
+            message += "description, ";
+        }
 
-        return EXIT_FAILURE;
-    }
+        message.pop_back();
+        message.pop_back();
 
-    if (state == NULL)
-    {
-        std::cerr << "State not provided. \n "
-                  << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        ;
-        return EXIT_FAILURE;
-    }
+        std::string fromComma = ",";
+        int lastCommaPosition = message.find_last_of(fromComma);
+        if (lastCommaPosition != std::string::npos);{
+            std::string toAnd = " and";
+            message.replace(lastCommaPosition, fromComma.length(), toAnd);
+        } 
 
-    if (token == NULL)
-    {
-        std::cerr << "Token not provided. \n "
-                  << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        ;
-        return EXIT_FAILURE;
-    }
+        message += " are mandatory but not provided! \n";
 
-    if (roomId == NULL)
-    {
-        std::cerr << "Room ID not provided. \n "
-                  << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        ;
-        return EXIT_FAILURE;
-    }
-
-    if (description == NULL)
-    {
-        std::cerr << "Description not provided. \n "
-                  << ": Usage: "
-                  << argv[0]
-                  << " --token token "
-                  << " --type type "
-                  << " --description  description "
-                  << " --summary summary "
-                  << " --host host "
-                  << " --service service "
-                  << " --state state "
-                  << " --roomId roomId "
-                  << std::endl;
-        ;
-        return EXIT_FAILURE;
-    }
-
-    if (summary == NULL)
-    {
-        std::cerr << "Summary not provided. \n "
+        std::cerr << message
                   << ": Usage: "
                   << argv[0]
                   << " --token token "
@@ -337,7 +286,7 @@ int main(int argc, char **argv)
 
     printf("Type: %s\n", type);
     printf("Hostname: %s\n", host);
-    if (service != NULL)
+    if (service)
     {
         printf("Service: %s\n", service);
     }
@@ -345,20 +294,100 @@ int main(int argc, char **argv)
     printf("Token: %s\n", token);
     printf("Room identifier: %s\n", roomId);
     printf("Description : %s\n", description);
-    printf("Summary: %s\n", summary);
+    if (summary)
+    {
+        printf("Summary: %s\n", summary);
+    }
+    if (icingaUrl)
+    {
+        /* code */
+        printf("Summary: %s\n", icingaUrl);
+    }
 
     std::cout << "#################################" << std::endl;
 
-    const char *url = "https://webexapis.com/v1/messages";
+    const char *webexUrl = "https://webexapis.com/v1/messages";
+
+    std::string testDescription = "\\\"Icinga Director: everything is fine\n\nDirector configuration: 3 tests OK\n[OK] Database resource 'Director DB' has been specified\n[OK] Make sure the DB schema exists\n[OK] There are no pending schema migrations\n\nDirector Deployments: 3 tests OK\n[OK] Deployment endpoint is 'muecklich.com'\n[OK] There are 0 un-deployed changes\n[OK] The last Deployment was successful 1m 37s ago\n\nImport Sources: 1 tests OK\n[OK] No Import Sources have been defined\n\nSync Rules: 1 tests OK\n[OK] No Sync Rules have been defined\n\nDirector Jobs: 1 tests OK\n[OK] No Jobs have been defined\n\\\"";
+
+    std::string mDescription(description);
+    std::string mSummary;
+
+    if (summary)
+    {
+        mSummary = summary;
+    }
 
     std::string from = "\n";
     std::string to = "\\n";
 
-    std::string str(description);
+    replaceAll(mDescription, from, to);
+    replaceAll(mDescription, "\[OK\]", "&#128994;");
+    replaceAll(mDescription, "\[WARNING\]", "&#128992;");
+    replaceAll(mDescription, "\[CRITICAL\]", "&#128308;");
+    replaceAll(mDescription, "\[UNKNOWN\]", "&#128995;");
 
-    replaceAll(str, from, to);
+    mDescription.erase(0, 2);
 
-    std::string body = "{\"roomId\": \"" + std::string(roomId) + "\", \"text\": \"[" + type + "]: " + summary + "\\n" + str + "\"}";
+    mDescription.pop_back();
+    mDescription.pop_back();
+
+    // https://icinga.muecklich.com/icingadb/host?name=muecklich.com
+
+    std::string body;
+
+    std::string mIcingaUrl(icingaUrl);
+    std::string mHost(host);
+    std::string mHostName(hostname);
+    std::string mService;
+    std::string mServiceLinkText;
+
+    replaceAll(mHost, ".", "\.");
+    replaceAll(mHost, " ", "%20");
+    replaceAll(mHostName, ".", "\.");
+
+    if (service)
+    {
+        /* code */
+        mService = std::string(service);
+        mServiceLinkText = mService;
+        replaceAll(mServiceLinkText, " ", "%20");
+    }
+
+    if (icingaUrl)
+    {
+        // std::string mHostLink = "[" + mHostName + "](" + mIcingaUrl + "/icingadb/host?name=" + mHost + ")";
+
+        // std::string mServiceLink = "[" + mService + "](" + mIcingaUrl + "/icingadb/service?name=" + mServiceLinkText + "&host.name=" + mHost + ")";
+
+        std::string mHostLink = "<a href=\\\"" + mIcingaUrl + "/icingadb/host?name=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mHostName + "</a>";
+
+        std::string mServiceLink = "<a href=\\\"" + mIcingaUrl + "/icingadb/service?name=" + mServiceLinkText + "&host.name=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mService + "</a>";
+
+        if (service)
+        {
+            mSummary = mServiceLink + " on " + mHostLink + " is " + std::string(state);
+        }
+        else
+        {
+            mSummary = mHostLink + " is " + std::string(state);
+        }
+
+        body = "{\"roomId\": \"" + std::string(roomId) + "\", \"html\": \"[" + type + "]: " + mSummary + "\\n" + mDescription + "\"}";
+    }
+    else
+    {
+        if (service)
+        {
+            mSummary = mService + " on " + mHost + " is " + std::string(state);
+        }
+        else
+        {
+            mSummary = mHost + " is " + std::string(state);
+        }
+
+        body = "{\"roomId\": \"" + std::string(roomId) + "\", \"text\": \"[" + type + "]: " + mSummary + "\\n" + mDescription + "\"}";
+    }
 
     try
     {
@@ -369,7 +398,7 @@ int main(int argc, char **argv)
 
         curlpp::Cleanup clean;
         curlpp::Easy r;
-        r.setOpt(new curlpp::options::Url(url));
+        r.setOpt(new curlpp::options::Url(webexUrl));
         r.setOpt(new curlpp::options::HttpHeader(header));
         r.setOpt(new curlpp::options::PostFields(body));
         r.setOpt(new curlpp::options::PostFieldSize(body.length()));
@@ -383,6 +412,11 @@ int main(int argc, char **argv)
         long responseStatusCode = curlpp::infos::ResponseCode::get(r);
         std::string responseBody = response.str();
 
+        if (responseStatusCode != 200)
+        {
+            return EXIT_FAILURE;
+        }
+        
         // other way to retreive URL
         std::cout << std::endl
                   << "Effective URL: "
