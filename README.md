@@ -20,12 +20,14 @@ Arguments:
 
                 --token, -t required            // Webex Bot token (See https://developer.webex.com/docs/bots for more information)
                 --type, -T required             // Notification Type, e.g. PROBLEM or RECOVERY
-                --description, -d required      // e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
-                --summary, -e required          // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2)
-                --host, -h required             // host name
+                --description, -d required      // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2)
+                --summary, -e                   // e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
+                --host, -h required             // host
+                --hostname, -h required         // host display name
                 --service, -s                   // service name
                 --state, -S required            // service state
                 --roomId, -r required           // Webex RoomId to send the message to
+                --icingaUrl, -h required        // Url for linking back to icinga, currently only supporting icingadb
 
 Example:
 
