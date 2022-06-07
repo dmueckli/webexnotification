@@ -33,7 +33,7 @@ Arguments:
 
 Example:
 
-    ./main --type PROBLEM --token WEBEXTOKEN --description "\"Icinga Director: there are problems
+    ./main --type "PROBLEM" --token WEBEXTOKEN --description "Icinga Director: there are problems
 
     Director configuration: 3 tests OK
     [OK] Database resource 'Director DB' has been specified
@@ -52,7 +52,7 @@ Example:
     [OK] No Sync Rules have been defined
 
     Director Jobs: 1 tests OK
-    [OK] No Jobs have been defined\"" --state CRITICAL --roomId WEBEXROOMID --icingaUrl 'https://icinga.example.com' --hostname 'Icinga Master' --service 'director' --host 'muecklich.com'
+    [OK] No Jobs have been defined" --state "CRITICAL" --roomId WEBEXROOMID --icingaUrl "https://icinga.example.com" --hostname "Icinga Master" --service "director" --host "icinga.example.com"
 
 Output:
 
