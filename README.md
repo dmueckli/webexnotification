@@ -41,7 +41,7 @@ Example:
     [OK] There are no pending schema migrations
 
     Director Deployments: 3 tests OK
-    [OK] Deployment endpoint is 'muecklich.com'
+    [OK] Deployment endpoint is 'icinga.example.com'
     [OK] There are 0 un-deployed changes
     [CRITICAL] The last Deployment failed 0m 32s ago
 
@@ -52,7 +52,7 @@ Example:
     [OK] No Sync Rules have been defined
 
     Director Jobs: 1 tests OK
-    [OK] No Jobs have been defined\"" --state CRITICAL --roomId WEBEXROOMID --icingaUrl 'https://icinga.muecklich.com' --hostname 'Icinga Master' --service 'director' --host 'muecklich.com'
+    [OK] No Jobs have been defined\"" --state CRITICAL --roomId WEBEXROOMID --icingaUrl 'https://icinga.example.com' --hostname 'Icinga Master' --service 'director' --host 'muecklich.com'
 
 Output:
 
