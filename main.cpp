@@ -14,6 +14,7 @@
 
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
+static bool monitoring = false;
 
 void replaceAll(std::string &mDescription, const std::string &from, const std::string &to)
 {
@@ -83,30 +84,8 @@ int main(int argc, char **argv)
     char *state = NULL;
     char *roomId = NULL;
     char *icingaUrl = NULL;
-
-    // std::cout << argc << std::endl;
-
-    // for (int i = 0; i < argc; i++)
-    // {
-    //     std::cout << argv[i] << std::endl;
-    // }
-
-    // if (argc < 15)
-    // {
-    //     std::cerr << argv[0] << ": Mandatory fields not provided." << std::endl
-    //               << argv[0] << ": Usage: "
-    //               << argv[0]
-    //               << " --token token "
-    //               << " --type type "
-    //               << " --description  description "
-    //               << " --summary summary "
-    //               << " --host host "
-    //               << " --service service "
-    //               << " --state state "
-    //               << " --roomId roomId "
-    //               << std::endl;
-    //     return EXIT_FAILURE;
-    // }
+    char *author = NULL;
+    char *comment = NULL;
 
     while (optind < argc)
     {
@@ -115,6 +94,9 @@ int main(int argc, char **argv)
                 /* These options set a flag. */
                 {"verbose", no_argument, &verbose_flag, 1},
                 {"brief", no_argument, &verbose_flag, 0},
+
+                {"monitoring", no_argument, 0, 'm'},
+
                 /* These options don’t set a flag.
                    We distinguish them by their indices. */
 
@@ -131,12 +113,14 @@ int main(int argc, char **argv)
                 {"state", required_argument, 0, 'S'},
                 {"roomId", required_argument, 0, 'r'},
                 {"icingaUrl", required_argument, 0, 'i'},
-                // {"files", required_argument, 0, 'f'},
+                {"author", required_argument, 0, 'a'},
+                {"comment", required_argument, 0, 'c'},
+
                 {0, 0, 0, 0}};
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long(argc, argv, "t:T:d:e:h:N:s:S:r:i:",
+        c = getopt_long(argc, argv, "ma:c:t:T:d:e:h:N:s:S:r:i:",
                         long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -151,10 +135,25 @@ int main(int argc, char **argv)
             /* If this option set a flag, do nothing else now. */
             if (long_options[option_index].flag != 0)
                 break;
-            printf("option %s", long_options[option_index].name);
-            if (optarg)
-                printf(" with arg %s", optarg);
+            std::cout << argc << std::endl;
+
+            for (int i = 0; i < argc; i++)
+            {
+                std::cout << argv[i] << std::endl;
+            }
             printf("\n");
+            break;
+
+        case 'm':
+            monitoring = true;
+            break;
+
+        case 'a':
+            author = optarg;
+            break;
+
+        case 'c':
+            comment = optarg;
             break;
 
         case 't':
@@ -219,38 +218,30 @@ int main(int argc, char **argv)
 
     if (!type || !token || !host || !state || !roomId || !description)
     {
-        // TODO: set the last comma to an and
-        int counter = 0;
         std::string message;
 
         if (!type)
         {
-            counter++;
             message += "type, ";
         }
         if (!token)
         {
-            counter++;
             message += "token, ";
         }
         if (!host)
         {
-            counter++;
             message += "host, ";
         }
         if (!state)
         {
-            counter++;
             message += "state, ";
         }
         if (!roomId)
         {
-            counter++;
             message += "roomId, ";
         }
         if (!description)
         {
-            counter++;
             message += "description, ";
         }
 
@@ -259,10 +250,12 @@ int main(int argc, char **argv)
 
         std::string fromComma = ",";
         int lastCommaPosition = message.find_last_of(fromComma);
-        if (lastCommaPosition != std::string::npos);{
+        if (lastCommaPosition != std::string::npos)
+            ;
+        {
             std::string toAnd = " and";
             message.replace(lastCommaPosition, fromComma.length(), toAnd);
-        } 
+        }
 
         message += " are mandatory but not provided! \n";
 
@@ -284,6 +277,8 @@ int main(int argc, char **argv)
 
     std::cout << "#################################" << std::endl;
 
+    printf("Monitoring FLAG: %i\n", monitoring);
+
     printf("Type: %s\n", type);
     printf("Hostname: %s\n", host);
     if (service)
@@ -300,15 +295,20 @@ int main(int argc, char **argv)
     }
     if (icingaUrl)
     {
-        /* code */
-        printf("Summary: %s\n", icingaUrl);
+        printf("Icinga Url: %s\n", icingaUrl);
+    }
+    if (author)
+    {
+        printf("Author: %s\n", author);
+    }
+    if (comment)
+    {
+        printf("Comment: %s\n", comment);
     }
 
     std::cout << "#################################" << std::endl;
 
     const char *webexUrl = "https://webexapis.com/v1/messages";
-
-    std::string testDescription = "\\\"Icinga Director: everything is fine\n\nDirector configuration: 3 tests OK\n[OK] Database resource 'Director DB' has been specified\n[OK] Make sure the DB schema exists\n[OK] There are no pending schema migrations\n\nDirector Deployments: 3 tests OK\n[OK] Deployment endpoint is 'muecklich.com'\n[OK] There are 0 un-deployed changes\n[OK] The last Deployment was successful 1m 37s ago\n\nImport Sources: 1 tests OK\n[OK] No Import Sources have been defined\n\nSync Rules: 1 tests OK\n[OK] No Sync Rules have been defined\n\nDirector Jobs: 1 tests OK\n[OK] No Jobs have been defined\n\\\"";
 
     std::string mDescription(description);
     std::string mSummary;
@@ -327,12 +327,13 @@ int main(int argc, char **argv)
     replaceAll(mDescription, "\[CRITICAL\]", "&#128308;");
     replaceAll(mDescription, "\[UNKNOWN\]", "&#128995;");
 
-    // mDescription.erase(0, 2);
-
-    // mDescription.pop_back();
-    // mDescription.pop_back();
-
-    // https://icinga.muecklich.com/icingadb/host?name=muecklich.com
+    if (author && comment)
+    {
+        mDescription += "\\n\\n";
+        mDescription += author;
+        mDescription += ": ";
+        mDescription += comment;
+    }
 
     std::string body;
 
@@ -356,13 +357,28 @@ int main(int argc, char **argv)
 
     if (icingaUrl)
     {
+        std::string mHostLink;
+
+        std::string mServiceLink;
+
+        if (!monitoring)
+        {
+            mHostLink = "<a href=\\\"" + mIcingaUrl + "/icingadb/host?name=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mHostName + "</a>";
+
+            if (service)
+                mServiceLink = "<a href=\\\"" + mIcingaUrl + "/icingadb/service?name=" + mServiceLinkText + "&host.name=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mService + "</a>";
+        }
+        else
+        {
+            mHostLink = "<a href=\\\"" + mIcingaUrl + "/monitoring/host/show?host=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mHostName + "</a>";
+
+            if (service)
+                mServiceLink = "<a href=\\\"" + mIcingaUrl + "/monitoring/service/show?host=" + mHost + "&service=" + mServiceLinkText + "\\\" rel=\\\"nofollow\\\">" + mService + "</a>";
+        }
+
         // std::string mHostLink = "[" + mHostName + "](" + mIcingaUrl + "/icingadb/host?name=" + mHost + ")";
 
         // std::string mServiceLink = "[" + mService + "](" + mIcingaUrl + "/icingadb/service?name=" + mServiceLinkText + "&host.name=" + mHost + ")";
-
-        std::string mHostLink = "<a href=\\\"" + mIcingaUrl + "/icingadb/host?name=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mHostName + "</a>";
-
-        std::string mServiceLink = "<a href=\\\"" + mIcingaUrl + "/icingadb/service?name=" + mServiceLinkText + "&host.name=" + mHost + "\\\" rel=\\\"nofollow\\\">" + mService + "</a>";
 
         if (service)
         {
@@ -416,7 +432,7 @@ int main(int argc, char **argv)
         {
             return EXIT_FAILURE;
         }
-        
+
         // other way to retreive URL
         std::cout << std::endl
                   << "Effective URL: "
