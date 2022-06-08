@@ -173,7 +173,8 @@ int main(int argc, char **argv)
             break;
 
         case 'h':
-            host = optarg;
+            if (optarg > 0)
+                host = optarg;
             break;
 
         case 'N':
