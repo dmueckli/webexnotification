@@ -20,19 +20,19 @@ Advice and contributions are welcome.
 
 Arguments:
 
-                --token, -t required            // Webex Bot token (See https://developer.webex.com/docs/bots for more information)
-                --type, -T required             // Notification Type, e.g. PROBLEM or RECOVERY
-                --description, -d required      // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2) 
-                --summary, -e                   // e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
-                --host, -h required             // host name
-                --hostname, -h required         // host display name
-                --service, -s                   // service name, if existent
-                --state, -S required            // service state
-                --roomId, -r required           // Webex RoomId to send the message to
-                --icingaUrl, -h required        // Url for linking back to icinga, set '--monitoring' for monitoring backend
-                --monitoring                    // Set this when using icingaweb monitoring backend
-                --author, -a                    // notification author, if existent
-                --comment, -c                   // notification comment, if existent
+                --token, -t required            // String: Webex Bot token (See https://developer.webex.com/docs/bots for more information)
+                --type, -T required             // String: Notification Type, e.g. PROBLEM or RECOVERY
+                --description, -d required      // String: e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2) 
+                --summary, -e                   // String: e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
+                --host, -h required             // String: host name
+                --hostname, -h required         // String: host display name
+                --service, -s                   // String: service name, if existent
+                --state, -S required            // String: service state
+                --roomId, -r required           // String: Webex RoomId to send the message to
+                --icingaUrl, -h required        // String: Url for linking back to icinga, set '--monitoring' for monitoring backend
+                --monitoring                    // Flag: Set this when using icingaweb monitoring backend
+                --author, -a                    // String: notification author, if existent
+                --comment, -c                   // String: notification comment, if existent
 
 Example:
 
