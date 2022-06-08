@@ -24,12 +24,14 @@ Arguments:
                 --type, -T required             // Notification Type, e.g. PROBLEM or RECOVERY
                 --description, -d required      // e.g. the plugin output: CRITICAL: Interface is 'down' (interface: 2 status: 2) 
                 --summary, -e                   // e.g. SERVICE on HOST is CRITICAL, or HOST is DOWN
-                --host, -h required             // host
+                --host, -h required             // host name
                 --hostname, -h required         // host display name
-                --service, -s                   // service name
+                --service, -s                   // service name, if existent
                 --state, -S required            // service state
                 --roomId, -r required           // Webex RoomId to send the message to
                 --icingaUrl, -h required        // Url for linking back to icinga, currently only supporting icingadb
+                --author, -a                    // notification author, if existent
+                --comment, -c                   // notification comment, if existent
 
 Example:
 
