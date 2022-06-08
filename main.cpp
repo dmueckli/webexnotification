@@ -28,49 +28,6 @@ void replaceAll(std::string &mDescription, const std::string &from, const std::s
     }
 }
 
-std::future<std::string> invoke(std::string const &webexUrl, std::string const &body, std::string const &token)
-{
-    std::future<std::string> rData = std::async(
-        std::launch::async,
-        [&token](std::string const &webexUrl, std::string const &body) mutable
-        {
-            std::list<std::string> header;
-            header.push_back("Authorization: Bearer " + token);
-            header.push_back("Content-Type: application/json");
-            header.push_back("Accept: application/json");
-
-            curlpp::Cleanup clean;
-            curlpp::Easy r;
-            r.setOpt(new curlpp::options::Url(webexUrl));
-            r.setOpt(new curlpp::options::HttpHeader(header));
-            r.setOpt(new curlpp::options::PostFields(body));
-            r.setOpt(new curlpp::options::PostFieldSize(body.length()));
-
-            std::ostringstream response;
-            r.setOpt(new curlpp::options::WriteStream(&response));
-
-            r.perform();
-
-            // other way to retreive URL
-            std::cout << std::endl
-                      << "Effective URL: "
-                      << curlpp::infos::EffectiveUrl::get(r)
-                      << std::endl;
-
-            std::cout << "Response code: "
-                      << curlpp::infos::ResponseCode::get(r)
-                      << std::endl;
-
-            const char responseStatusCode = curlpp::infos::ResponseCode::get(r);
-            const char *responseBody = response.str().c_str();
-
-            return std::string(response.str());
-        },
-        webexUrl, body);
-
-    return rData;
-}
-
 int main(int argc, char **argv)
 {
     int c;
