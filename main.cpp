@@ -5,6 +5,8 @@
 #include <thread>
 #include <getopt.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
@@ -14,7 +16,8 @@
 
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
-static bool monitoring = false;
+
+static int monitoring;
 
 void replaceAll(std::string &mDescription, const std::string &from, const std::string &to)
 {
@@ -26,6 +29,49 @@ void replaceAll(std::string &mDescription, const std::string &from, const std::s
         mDescription.replace(start_pos, from.length(), to);
         start_pos += to.length(); // In case 'to' contains 'from', like replacing 'from' with 'to'
     }
+}
+
+std::future<std::string> invoke(std::string const &webexUrl, std::string const &body, std::string const &token)
+{
+    std::future<std::string> rData = std::async(
+        std::launch::async,
+        [&token](std::string const &webexUrl, std::string const &body) mutable
+        {
+            std::list<std::string> header;
+            header.push_back("Authorization: Bearer " + token);
+            header.push_back("Content-Type: application/json");
+            header.push_back("Accept: application/json");
+
+            curlpp::Cleanup clean;
+            curlpp::Easy r;
+            r.setOpt(new curlpp::options::Url(webexUrl));
+            r.setOpt(new curlpp::options::HttpHeader(header));
+            r.setOpt(new curlpp::options::PostFields(body));
+            r.setOpt(new curlpp::options::PostFieldSize(body.length()));
+
+            std::ostringstream response;
+            r.setOpt(new curlpp::options::WriteStream(&response));
+
+            r.perform();
+
+            // other way to retreive URL
+            std::cout << std::endl
+                      << "Effective URL: "
+                      << curlpp::infos::EffectiveUrl::get(r)
+                      << std::endl;
+
+            std::cout << "Response code: "
+                      << curlpp::infos::ResponseCode::get(r)
+                      << std::endl;
+
+            const char responseStatusCode = curlpp::infos::ResponseCode::get(r);
+            const char *responseBody = response.str().c_str();
+
+            return std::string(response.str());
+        },
+        webexUrl, body);
+
+    return rData;
 }
 
 int main(int argc, char **argv)
@@ -52,7 +98,7 @@ int main(int argc, char **argv)
                 {"verbose", no_argument, &verbose_flag, 1},
                 {"brief", no_argument, &verbose_flag, 0},
 
-                {"monitoring", no_argument, 0, 'm'},
+                {"monitoring", no_argument, &monitoring, 1},
 
                 /* These options don’t set a flag.
                    We distinguish them by their indices. */
@@ -101,12 +147,9 @@ int main(int argc, char **argv)
             printf("\n");
             break;
 
-        case 'm':
-            monitoring = true;
-            break;
-
         case 'a':
-            author = optarg;
+            if (optarg > 0)
+                author = optarg;
             break;
 
         case 'c':
@@ -173,31 +216,31 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    if (!type || !token || !host || !state || !roomId || !description)
+    if (!type || strlen(type) == 0 || !token || strlen(token) == 0 || !host || strlen(host) == 0 || !state || strlen(state) == 0 || !roomId || strlen(roomId) == 0 || !description || strlen(description) == 0)
     {
         std::string message;
 
-        if (!type)
+        if (!type || strlen(type) == 0)
         {
             message += "type, ";
         }
-        if (!token)
+        if (!token || strlen(token) == 0)
         {
             message += "token, ";
         }
-        if (!host)
+        if (!host || strlen(host) == 0)
         {
             message += "host, ";
         }
-        if (!state)
+        if (!state || strlen(state) == 0)
         {
             message += "state, ";
         }
-        if (!roomId)
+        if (!roomId || strlen(roomId) == 0)
         {
             message += "roomId, ";
         }
-        if (!description)
+        if (!description || strlen(description) == 0)
         {
             message += "description, ";
         }
@@ -254,11 +297,11 @@ int main(int argc, char **argv)
     {
         printf("Icinga Url: %s\n", icingaUrl);
     }
-    if (author)
+    if (strlen(author) > 0)
     {
         printf("Author: %s\n", author);
     }
-    if (comment)
+    if (strlen(comment) > 0)
     {
         printf("Comment: %s\n", comment);
     }
@@ -284,7 +327,7 @@ int main(int argc, char **argv)
     replaceAll(mDescription, "\[CRITICAL\]", "&#128308;");
     replaceAll(mDescription, "\[UNKNOWN\]", "&#128995;");
 
-    if (author && comment|| author != "" && comment != "")
+    if (strlen(author) > 0 && strlen(comment) > 0)
     {
         mDescription += "\\n\\n";
         mDescription += author;
