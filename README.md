@@ -29,7 +29,8 @@ Arguments:
                 --service, -s                   // service name, if existent
                 --state, -S required            // service state
                 --roomId, -r required           // Webex RoomId to send the message to
-                --icingaUrl, -h required        // Url for linking back to icinga, currently only supporting icingadb
+                --icingaUrl, -h required        // Url for linking back to icinga, set '--monitoring' for monitoring backend
+                --monitoring                    // Set this when using icingaweb monitoring backend
                 --author, -a                    // notification author, if existent
                 --comment, -c                   // notification comment, if existent
 
