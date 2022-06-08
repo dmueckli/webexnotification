@@ -153,19 +153,23 @@ int main(int argc, char **argv)
             break;
 
         case 'c':
-            comment = optarg;
+            if (optarg > 0)
+                comment = optarg;
             break;
 
         case 't':
-            token = optarg;
+            if (optarg > 0)
+                token = optarg;
             break;
 
         case 'T':
-            type = optarg;
+            if (optarg > 0)
+                type = optarg;
             break;
 
         case 'd':
-            description = optarg;
+            if (optarg > 0)
+                description = optarg;
             break;
 
         case 'h':
@@ -173,27 +177,33 @@ int main(int argc, char **argv)
             break;
 
         case 'N':
-            hostname = optarg;
+            if (optarg > 0)
+                hostname = optarg;
             break;
 
         case 's':
-            service = optarg;
+            if (optarg > 0)
+                service = optarg;
             break;
 
         case 'S':
-            state = optarg;
+            if (optarg > 0)
+                state = optarg;
             break;
 
         case 'r':
-            roomId = optarg;
+            if (optarg > 0)
+                roomId = optarg;
             break;
 
         case 'e':
-            summary = optarg;
+            if (optarg > 0)
+                summary = optarg;
             break;
 
         case 'i':
-            icingaUrl = optarg;
+            if (optarg > 0)
+                icingaUrl = optarg;
             break;
 
         case '?':
@@ -251,7 +261,6 @@ int main(int argc, char **argv)
         std::string fromComma = ",";
         int lastCommaPosition = message.find_last_of(fromComma);
         if (lastCommaPosition != std::string::npos)
-            ;
         {
             std::string toAnd = " and";
             message.replace(lastCommaPosition, fromComma.length(), toAnd);
@@ -280,7 +289,11 @@ int main(int argc, char **argv)
     printf("Monitoring FLAG: %i\n", monitoring);
 
     printf("Type: %s\n", type);
-    printf("Hostname: %s\n", host);
+    if (host)
+    {
+        printf("Hostname: %s\n", host);
+    }
+
     if (service)
     {
         printf("Service: %s\n", service);
