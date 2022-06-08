@@ -327,7 +327,7 @@ int main(int argc, char **argv)
     replaceAll(mDescription, "\[CRITICAL\]", "&#128308;");
     replaceAll(mDescription, "\[UNKNOWN\]", "&#128995;");
 
-    if (author && comment)
+    if (author && comment|| author != "" && comment != "")
     {
         mDescription += "\\n\\n";
         mDescription += author;
