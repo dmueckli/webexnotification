@@ -6,7 +6,18 @@ Please note that I am currently taking my first steps in programming through pro
 
 Advice and contributions are welcome. 
 
-## Usage 
+Prior to using the script you need to set up a new webex chat bot and find out the room id you want to message to:
+
+WebEx Bots/Apps:
+https://developer.webex.com/my-apps/
+
+To create a new WebEx Chat Bot:
+https://developer.webex.com/my-apps/new/bot
+
+To find out the Room ID:
+https://developer.webex.com/docs/api/v1/rooms/list-rooms
+
+## Installation
 
 1. Install dependencies:
  
@@ -16,7 +27,11 @@ Advice and contributions are welcome.
 
         g++ main.cpp -l curlpp -l curl -l pthread -o main
         
-3. Create notification command directly via the director or by manually adding a new command template to icinga.
+3. Copy the compiled script to the icinga plugins folder (usually "/usr/lib/nagios/plugins").
+
+## Usage
+
+Create notification command directly via the director or by manually adding a new command template to icinga.
 
 Arguments:
 
